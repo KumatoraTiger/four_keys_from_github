@@ -12,6 +12,12 @@ function getPrevReleaseCommit(commits) {
     }
     return commits.at(0);
 }
+function formatGitHubDateTimeString(dateTimeString) {
+    if (dateTimeString === undefined) {
+        return undefined;
+    }
+    return dateTimeString.replace("T", " ").replace(/([-+]\d{2}):/, " $1:");
+}
 function calculateIntervalDaysFromStringDate(olderDate, newerDate) {
     if (olderDate === undefined || newerDate === undefined) {
         return NaN;
@@ -58,7 +64,7 @@ function summarizeTag(commits, defaultPrevReleaseCommit) {
     const releaseCommit = commits.at(-1);
     const prevReleaseCommit = defaultPrevReleaseCommit || getPrevReleaseCommit(commits);
     return {
-        releaseDate: (_a = releaseCommit === null || releaseCommit === void 0 ? void 0 : releaseCommit.author) === null || _a === void 0 ? void 0 : _a.date,
+        releaseDate: formatGitHubDateTimeString((_a = releaseCommit === null || releaseCommit === void 0 ? void 0 : releaseCommit.author) === null || _a === void 0 ? void 0 : _a.date),
         releaseIntervalTime: calculateIntervalDaysFromStringDate((_b = prevReleaseCommit === null || prevReleaseCommit === void 0 ? void 0 : prevReleaseCommit.author) === null || _b === void 0 ? void 0 : _b.date, (_c = releaseCommit === null || releaseCommit === void 0 ? void 0 : releaseCommit.author) === null || _c === void 0 ? void 0 : _c.date),
         numberOfPrs: countNumberOfPrs(commits),
         commitLeadtimeAverage: calculateCommitLeadtimeAverage(releaseCommit, commits),

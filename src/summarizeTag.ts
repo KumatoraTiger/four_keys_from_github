@@ -22,6 +22,13 @@ function getPrevReleaseCommit(commits: Commit[]) {
   return commits.at(0)
 }
 
+function formatGitHubDateTimeString(dateTimeString: string | undefined) {
+  if (dateTimeString === undefined) {
+    return undefined
+  }
+  return dateTimeString.replace("T", " ").replace(/([-+]\d{2}):/, " $1:");
+}
+
 function calculateIntervalDaysFromStringDate(olderDate: string | undefined, newerDate: string | undefined) {
   if (olderDate === undefined || newerDate === undefined) {
     return NaN
@@ -78,7 +85,7 @@ function summarizeTag(commits: Commit[], defaultPrevReleaseCommit: Commit | unde
   const prevReleaseCommit = defaultPrevReleaseCommit || getPrevReleaseCommit(commits)
 
   return {
-    releaseDate: releaseCommit?.author?.date,
+    releaseDate: formatGitHubDateTimeString(releaseCommit?.author?.date),
     releaseIntervalTime: calculateIntervalDaysFromStringDate(prevReleaseCommit?.author?.date, releaseCommit?.author?.date),
     numberOfPrs: countNumberOfPrs(commits),
     commitLeadtimeAverage: calculateCommitLeadtimeAverage(releaseCommit, commits),
