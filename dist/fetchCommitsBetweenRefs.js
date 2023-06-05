@@ -66,15 +66,10 @@ function fetchCommitsBetweenRefs(owner, repo, baseRefName, headRefName) {
         while (hasNextPage) {
             const resp = yield (0, queryGraphQl_1.queryGraphQl)(generateQuery(owner, repo, baseRefName, headRefName, cursor));
             const { pageInfo, nodes: nodes } = resp.repository.ref.compare.commits;
-            nodes.forEach((node) => {
-                // console.log(node);
-                // console.log(node.associatedPullRequests.nodes[0]);
-            });
             allCommits = allCommits.concat(nodes);
             hasNextPage = pageInfo.hasNextPage;
             cursor = pageInfo.endCursor;
         }
-        // console.log(allCommits)
         return allCommits;
     });
 }

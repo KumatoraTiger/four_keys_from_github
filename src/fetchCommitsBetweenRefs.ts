@@ -61,16 +61,11 @@ async function fetchCommitsBetweenRefs(owner: string, repo: string, baseRefName:
 
     const { pageInfo, nodes: nodes } = resp.repository.ref.compare.commits;
 
-    nodes.forEach((node: any) => {
-      // console.log(node);
-      // console.log(node.associatedPullRequests.nodes[0]);
-    });
     allCommits = allCommits.concat(nodes);
 
     hasNextPage = pageInfo.hasNextPage;
     cursor = pageInfo.endCursor;
   }
-  // console.log(allCommits)
 
   return allCommits;
 }
