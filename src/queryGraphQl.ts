@@ -30,6 +30,13 @@ async function queryGraphQl(query: string, maxRetries: number = 3): Promise<any>
           // 指定秒数待機
           const waitTime = parseInt(String(retryAfter), 10) * 1000;
           await new Promise(resolve => setTimeout(resolve, waitTime));
+          continue;
+        }
+
+        const error_types = error?.errors?.map(error => error?.type);
+        if (error_types !== undefined && error_types.some(error_type => error_type === 'RATE_LIMITED')) {
+          console.error('rate limit exceeded')
+          await new Promise(resolve => setTimeout(resolve, 60 * 60 * 1000));
         }
       } else {
         await new Promise(resolve => setTimeout(resolve, 60 * 1000));

@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.queryGraphQl = void 0;
 const graphql_1 = require("@octokit/graphql");
 function queryGraphQl(query, maxRetries = 3) {
-    var _a;
+    var _a, _b;
     return __awaiter(this, void 0, void 0, function* () {
         const githubToken = process.env.GITHUB_TOKEN;
         let retries = 0;
@@ -36,6 +36,12 @@ function queryGraphQl(query, maxRetries = 3) {
                         // 指定秒数待機
                         const waitTime = parseInt(String(retryAfter), 10) * 1000;
                         yield new Promise(resolve => setTimeout(resolve, waitTime));
+                        continue;
+                    }
+                    const error_types = (_b = error === null || error === void 0 ? void 0 : error.errors) === null || _b === void 0 ? void 0 : _b.map(error => error === null || error === void 0 ? void 0 : error.type);
+                    if (error_types !== undefined && error_types.some(error_type => error_type === 'RATE_LIMITED')) {
+                        console.error('rate limit exceeded');
+                        yield new Promise(resolve => setTimeout(resolve, 60 * 60 * 1000));
                     }
                 }
                 else {
