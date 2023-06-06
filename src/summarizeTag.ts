@@ -1,4 +1,5 @@
 import { Commit, Pr } from "./types";
+import { calculateIntervalDaysFromStringDate } from "./utils";
 
 interface SummarizedTag {
   releaseDate: string | undefined;
@@ -26,15 +27,7 @@ function formatGitHubDateTimeString(dateTimeString: string | undefined) {
   if (dateTimeString === undefined) {
     return undefined
   }
-  return dateTimeString.replace("T", " ").replace(/([-+]\d{2}):/, " $1:");
-}
-
-function calculateIntervalDaysFromStringDate(olderDate: string | undefined, newerDate: string | undefined) {
-  if (olderDate === undefined || newerDate === undefined) {
-    return NaN
-  }
-
-  return (Date.parse(newerDate) - Date.parse(olderDate)) / 1000 / 60 / 60 / 24;
+  return dateTimeString.replace("T", " ");
 }
 
 function botCreatedPr(pr: Pr) {

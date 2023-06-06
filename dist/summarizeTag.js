@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.summarizeTag = void 0;
+const utils_1 = require("./utils");
 function getPrevReleaseCommit(commits) {
     const mergeTag = commits.find(commit => commit.message.includes("Merge tag"));
     if (mergeTag !== undefined) {
@@ -16,13 +17,7 @@ function formatGitHubDateTimeString(dateTimeString) {
     if (dateTimeString === undefined) {
         return undefined;
     }
-    return dateTimeString.replace("T", " ").replace(/([-+]\d{2}):/, " $1:");
-}
-function calculateIntervalDaysFromStringDate(olderDate, newerDate) {
-    if (olderDate === undefined || newerDate === undefined) {
-        return NaN;
-    }
-    return (Date.parse(newerDate) - Date.parse(olderDate)) / 1000 / 60 / 60 / 24;
+    return dateTimeString.replace("T", " ");
 }
 function botCreatedPr(pr) {
     var _a, _b;
@@ -51,7 +46,7 @@ function calculateCommitLeadtimeAverage(releaseCommit, commits) {
     if (memberCommits.length === 0) {
         return undefined;
     }
-    const totalLeadTime = memberCommits.reduce((sum, commit) => sum + calculateIntervalDaysFromStringDate(commit.author.date, releaseCommit.author.date), 0);
+    const totalLeadTime = memberCommits.reduce((sum, commit) => sum + (0, utils_1.calculateIntervalDaysFromStringDate)(commit.author.date, releaseCommit.author.date), 0);
     return totalLeadTime / memberCommits.length;
 }
 function countNumberOfHotfixPrs(commits) {
@@ -65,7 +60,7 @@ function summarizeTag(commits, defaultPrevReleaseCommit) {
     const prevReleaseCommit = defaultPrevReleaseCommit || getPrevReleaseCommit(commits);
     return {
         releaseDate: formatGitHubDateTimeString((_a = releaseCommit === null || releaseCommit === void 0 ? void 0 : releaseCommit.author) === null || _a === void 0 ? void 0 : _a.date),
-        releaseIntervalTime: calculateIntervalDaysFromStringDate((_b = prevReleaseCommit === null || prevReleaseCommit === void 0 ? void 0 : prevReleaseCommit.author) === null || _b === void 0 ? void 0 : _b.date, (_c = releaseCommit === null || releaseCommit === void 0 ? void 0 : releaseCommit.author) === null || _c === void 0 ? void 0 : _c.date),
+        releaseIntervalTime: (0, utils_1.calculateIntervalDaysFromStringDate)((_b = prevReleaseCommit === null || prevReleaseCommit === void 0 ? void 0 : prevReleaseCommit.author) === null || _b === void 0 ? void 0 : _b.date, (_c = releaseCommit === null || releaseCommit === void 0 ? void 0 : releaseCommit.author) === null || _c === void 0 ? void 0 : _c.date),
         numberOfPrs: countNumberOfPrs(commits),
         commitLeadtimeAverage: calculateCommitLeadtimeAverage(releaseCommit, commits),
         numberOfHotfixPrs: countNumberOfHotfixPrs(commits)
