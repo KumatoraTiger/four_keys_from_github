@@ -31,10 +31,6 @@ async function output(team: string, owner: string, repository: string) {
     ].join(",")}`);
     prevReleaseCommit = commits.at(-1)
   };
-  // prevReleaseCommit = (await fetchCommitsBetweenRefs(owner, repository, "v11.0.1", "v11.0.2")).at(-1)
-  // const commits = await fetchCommitsBetweenRefs(owner, repository, "v11.0.1", "v11.0.2")
-  // const output = summarizeTag(commits, prevReleaseCommit);
-  // console.log(`${[owner, team, repository].concat(output.map(item => String(item))).join(",")}`);
 }
 
 async function main() {
