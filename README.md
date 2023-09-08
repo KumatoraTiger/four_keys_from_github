@@ -1,14 +1,13 @@
 # README
 
-This repository contains code that fetches and summarizes data related to releases and commits in a GitHub repository. The code assumes that tags are assigned to each release. The code processes a CSV file containing information about different repositories and teams and outputs the summarized data in a CSV format.
+This repository contains code designed to fetch and summarize data associated with releases and commits within a GitHub repository. It's built on the assumption that each release has corresponding tags. The primary function of this code is to process a CSV file detailing information on various repositories and their associated teams, subsequently outputting the summarized data in CSV format.
 
 ## Installation
 
-1. Clone this repository to your local machine.
-2. Navigate to the repository's directory.
-3. Install the required dependencies by running the following command:
-
-   ```
+1. Clone this repository onto your local machine.
+2. Navigate to the cloned directory.
+3. Install the necessary dependencies with the command:
+   ```bash
    npm install
    ```
 
@@ -16,78 +15,80 @@ This repository contains code that fetches and summarizes data related to releas
 
 1. Set up a personal access token on GitHub:
 
-   - Go to [GitHub Settings](https://github.com/settings/tokens) and generate a new personal access token with the necessary permissions.
-   - Make sure to enable the `repo` scope for accessing repositories.
-   - Copy the generated personal access token to your clipboard.
+   - Visit [GitHub Settings](https://github.com/settings/tokens) and generate a new personal access token with the appropriate permissions.
+   - Ensure you enable the `repo` scope for repository access.
+   - Copy the generated token.
 
-2. Set the `GITHUB_TOKEN` environment variable:
-   - Create a new file named `.env` in the root of the repository.
-   - Open the `.env` file and add the following line:
-     ```
+2. Configure the `GITHUB_TOKEN` environment variable:
+
+   - Create a `.env` file in the repository's root directory.
+   - Within the `.env` file, insert:
+     ```bash
      GITHUB_TOKEN=YOUR_PERSONAL_ACCESS_TOKEN
      ```
-   - Replace `YOUR_PERSONAL_ACCESS_TOKEN` with the personal access token you generated.
+   - Substitute `YOUR_PERSONAL_ACCESS_TOKEN` with the token you generated earlier.
+
+3. To exclude commits made by specific users:
+   - Copy `.env.sample` to `.env` and adjust the `BOT_NAMES` accordingly.
 
 ## Usage
 
-1. Prepare a CSV file with the following format:
+1. Prepare a CSV file formatted as follows:
 
-   ```
+   ```csv
    owner1,team1,repository1
    owner2,team2,repository2
-   owner3,team3,repository3
    ...
    ```
 
-   Each row represents a repository to fetch data for, with the owner, team, and repository name separated by commas.
+   Here, each line represents a repository, indicating its owner, the team, and the repository name.
 
-2. Run the code by executing the following command:
+2. To execute the code, use:
 
+   ```bash
+   npm start <path_to_your_CSV_file> <start_date_for_tags>
    ```
-   npm start <csv_file_path>
-   ```
 
-   Replace `<csv_file_path>` with the path to your CSV file.
+   Replace `<path_to_your_CSV_file>` with your CSV file's path and `<start_date_for_tags>` with the desired starting date for fetching release tags.
 
-3. The code will fetch data for each repository specified in the CSV file and output the summarized information in the console.
+3. The program will gather data for every repository specified in the CSV file. It will then generate a summary in both `./out/output.csv` and the console.
 
 ## Output
 
-The code outputs the following information for each release:
+For each release, the output will display:
 
 - Repository owner
 - Team
 - Repository name
 - Tag name
 - Release date
-- Release interval time
-- Number of pull requests
-- Commit lead time average
-- Number of hotfix pull requests
+- Total pull requests
+- Hotfix pull requests
+- Commits within pull requests
+- Cumulative time until commits' release
 
-To determine the number of hotfix pull requests, the code relies on the presence of a "hotfix" label assigned to the respective pull requests.
+To identify hotfix pull requests, the software checks for the "hotfix" label on the respective pull requests.
 
-The output is displayed in the console as comma-separated values (CSV) for each release.
+Results appear in the console in CSV format.
 
 ## Example
 
-Here is an example of how to use the code:
+To illustrate its usage:
 
-1. Create a CSV file named `repositories.csv` with the following content:
+1. Craft a CSV file named `repositories.csv` with:
 
-   ```
+   ```csv
    john,team1,repo1
    jane,team2,repo2
    ```
 
-2. Execute the following command:
-
+2. Run:
+   ```bash
+   npm start /path_to_your_file/repositories.csv 2023-09-01T00:00:00+09:00
    ```
-   npm start /pathToYourCsvFile/repositories.csv
-   ```
 
-   The code will fetch and summarize data for `repo1` and `repo2` and display the results in the console.
+The code will then extract and condense data for both `repo1` and `repo2`, presenting the summary in the console.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE).
+This software is under the [MIT License](LICENSE).
