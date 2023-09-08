@@ -29,7 +29,7 @@ This repository contains code designed to fetch and summarize data associated wi
    - Substitute `YOUR_PERSONAL_ACCESS_TOKEN` with the token you generated earlier.
 
 3. To exclude commits made by specific users:
-   - Copy `.env.sample` to `.env` and adjust the `BOT_NAMES` accordingly.
+   - Modify `.env` and adjust the `BOT_NAMES` accordingly.
 
 ## Usage
 
