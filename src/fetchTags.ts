@@ -71,10 +71,11 @@ async function fetchTagsFromGithub(owner: string, repo: string): Promise<GraphQl
 }
 
 function formatGraphQlQueryResponseTag(tag: GraphQlQueryResponseTag): Tag {
+  const committedDateString = tag.target?.committedDate || tag.target?.target?.committedDate;
   return {
     name: tag.name,
     commitAbbreviatedOid: tag.target?.abbreviatedOid || tag.target?.target?.abbreviatedOid,
-    committedDate: tag.target?.committedDate || tag.target?.target?.committedDate
+    committedDate: committedDateString ? new Date(committedDateString) : undefined
   }
 }
 
@@ -88,10 +89,15 @@ function sortByCommittedDate(tags: Tag[]) {
   });
 }
 
-async function fetchTags(owner: string, repo: string): Promise<Tag[]> {
-  const allTags = await fetchTagsFromGithub(owner, repo);
+function filterAfterDate(tags: Tag[], afterDate: Date) {
+  return tags.filter(tag => tag.committedDate === undefined || tag.committedDate > afterDate);
+}
 
-  return sortByCommittedDate(allTags.map(tag => formatGraphQlQueryResponseTag(tag)));
+async function fetchTags(owner: string, repo: string, fromDate: Date): Promise<Tag[]> {
+  const allTags = await fetchTagsFromGithub(owner, repo);
+  const tags = allTags.map(tag => formatGraphQlQueryResponseTag(tag));
+
+  return sortByCommittedDate(filterAfterDate(tags, fromDate));
 }
 
 export { fetchTags };

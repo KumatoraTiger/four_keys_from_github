@@ -1,13 +1,4 @@
-import { Commit, Pr } from "./types";
-import { calculateIntervalDaysFromStringDate } from "./utils";
-
-interface SummarizedTag {
-  releaseDate: string | undefined;
-  releaseIntervalTime: number;
-  numberOfPrs: number;
-  commitLeadtimeAverage: number | undefined;
-  numberOfHotfixPrs: number;
-}
+import { Commit, Pr, SummarizedTag } from "./types";
 
 function getPrevReleaseCommit(commits: Commit[]) {
   const mergeTag = commits.find(commit => commit.message.includes("Merge tag"))
@@ -30,13 +21,14 @@ function formatGitHubDateTimeString(dateTimeString: string | undefined) {
   return dateTimeString.replace("T", " ");
 }
 
+const botNames = process.env.BOT_NAMES?.split(",") || []
 function botCreatedPr(pr: Pr) {
-  return pr.author?.resourcePath?.includes("bot") || false;
+  return botNames.some(botName => pr.author?.resourcePath?.includes(botName))
 }
 
 function memberCreatedCommits(commits: Commit[]) {
   return commits
-          .filter(commit => commit.committer.name !== "GitHub")
+          .filter(commit => commit.committer.name !== "GitHub" || commit.message.startsWith("Revert"))
           .filter(commit => commit.associatedPullRequests.nodes[0] !== undefined)
           .filter(commit => !botCreatedPr(commit.associatedPullRequests.nodes[0]));
 }
@@ -52,19 +44,24 @@ function countNumberOfPrs(commits: Commit[]) {
   return uniquePrs(commits).length
 }
 
-function calculateCommitLeadtimeAverage(releaseCommit: Commit | undefined, commits: Commit[]) {
+function calculateIntervalDaysFromStringDate(olderDate: string | undefined, newerDate: string | undefined) {
+  if (olderDate === undefined || newerDate === undefined) {
+    return NaN
+  }
+
+  return (Date.parse(newerDate) - Date.parse(olderDate)) / 1000 / 60 / 60 / 24;
+}
+
+function calculateNumberOfCommitsAndTotalCommitLeadtime(releaseCommit: Commit | undefined, commits: Commit[]): [number, number] {
   if (releaseCommit === undefined) {
-    return undefined;
+    return [0, 0]
   }
 
   const memberCommits = memberCreatedCommits(commits)
-  if (memberCommits.length === 0) {
-    return undefined;
-  }
 
   const totalLeadTime = memberCommits.reduce((sum, commit) => sum + calculateIntervalDaysFromStringDate(commit.author.date, releaseCommit.author.date), 0)
 
-  return totalLeadTime / memberCommits.length
+  return [memberCommits.length, totalLeadTime]
 }
 
 function countNumberOfHotfixPrs(commits: Commit[]) {
@@ -77,12 +74,14 @@ function summarizeTag(commits: Commit[], defaultPrevReleaseCommit: Commit | unde
   const releaseCommit = commits.at(-1)
   const prevReleaseCommit = defaultPrevReleaseCommit || getPrevReleaseCommit(commits)
 
+  const [numberOfCommits, commitTotalLeadtime] = calculateNumberOfCommitsAndTotalCommitLeadtime(releaseCommit, commits)
+
   return {
-    releaseDate: formatGitHubDateTimeString(releaseCommit?.author?.date),
-    releaseIntervalTime: calculateIntervalDaysFromStringDate(prevReleaseCommit?.author?.date, releaseCommit?.author?.date),
-    numberOfPrs: countNumberOfPrs(commits),
-    commitLeadtimeAverage: calculateCommitLeadtimeAverage(releaseCommit, commits),
-    numberOfHotfixPrs: countNumberOfHotfixPrs(commits)
+    release_date: formatGitHubDateTimeString(releaseCommit?.author?.date),
+    number_of_prs: countNumberOfPrs(commits),
+    number_of_hotfix_prs: countNumberOfHotfixPrs(commits),
+    number_of_commits: numberOfCommits,
+    commit_total_leadtime: commitTotalLeadtime
   }
 }
 

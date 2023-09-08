@@ -1,6 +1,6 @@
 import { graphql, GraphqlResponseError } from '@octokit/graphql';
 
-async function queryGraphQl(query: string, maxRetries: number = 3): Promise<any> {
+async function queryGraphQl(query: string, maxRetries: number = 6): Promise<any> {
   const githubToken = process.env.GITHUB_TOKEN;
 
   let retries = 0;
@@ -36,7 +36,7 @@ async function queryGraphQl(query: string, maxRetries: number = 3): Promise<any>
         const error_types = error?.errors?.map(error => error?.type);
         if (error_types !== undefined && error_types.some(error_type => error_type === 'RATE_LIMITED')) {
           console.error('rate limit exceeded')
-          await new Promise(resolve => setTimeout(resolve, 60 * 60 * 1000));
+          await new Promise(resolve => setTimeout(resolve, 10 * 60 * 1000));
         }
       } else {
         await new Promise(resolve => setTimeout(resolve, 60 * 1000));

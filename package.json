@@ -25,6 +25,8 @@
   },
   "dependencies": {
     "@octokit/graphql": "^5.0.6",
-    "csv-parse": "^5.4.0"
+    "csv-parse": "^5.4.0",
+    "csv-stringify": "^6.4.0",
+    "dotenv": "^16.3.1"
   }
 }
